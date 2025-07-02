@@ -18,6 +18,7 @@ export default function Dashboard() {
 
   const { data: stats, refetch: refetchStats } = useQuery<DocumentStats>({
     queryKey: ["/api/stats"],
+    refetchInterval: 2000, // Refetch every 2 seconds to get updates
   });
 
   const handleExportToExcel = async () => {

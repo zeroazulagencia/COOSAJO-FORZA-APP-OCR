@@ -26,13 +26,18 @@ export default function DocumentsTab({ onViewDocument, onRefreshData }: Document
     queryKey: ["/api/documents", filters],
     queryFn: async () => {
       const params = new URLSearchParams();
-      if (filters.status !== "all") params.set("status", filters.status);
-      if (filters.uploadDate) params.set("uploadDate", filters.uploadDate);
+      if (filters.status !== "all" && filters.status !== "") {
+        params.set("status", filters.status);
+      }
+      if (filters.uploadDate) {
+        params.set("uploadDate", filters.uploadDate);
+      }
       
       const response = await fetch(`/api/documents?${params}`);
       if (!response.ok) throw new Error("Failed to fetch documents");
       return response.json();
     },
+    refetchInterval: 2000, // Refetch every 2 seconds to get updates
   });
 
   const handleRetryFailed = async () => {
@@ -88,14 +93,14 @@ export default function DocumentsTab({ onViewDocument, onRefreshData }: Document
     const statusConfig = {
       queued: { variant: "secondary" as const, icon: "clock", text: "En cola" },
       processing: { variant: "default" as const, icon: "sync-alt", text: "Procesando" },
-      processed: { variant: "success" as const, icon: "check-circle", text: "Exitoso" },
+      processed: { variant: "default" as const, icon: "check-circle", text: "Exitoso", className: "bg-green-100 text-green-800" },
       failed: { variant: "destructive" as const, icon: "exclamation-circle", text: "Error" },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.queued;
     
     return (
-      <Badge variant={config.variant} className="flex items-center gap-1 w-fit">
+      <Badge variant={config.variant} className={`flex items-center gap-1 w-fit ${config.className || ''}`}>
         <i className={`fas fa-${config.icon} text-xs ${status === 'processing' ? 'animate-spin' : ''}`}></i>
         {config.text}
       </Badge>
