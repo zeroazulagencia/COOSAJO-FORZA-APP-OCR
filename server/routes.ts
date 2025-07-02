@@ -191,20 +191,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const documents = await storage.getDocuments();
       const processedDocs = documents.filter(doc => doc.status === 'processed' && doc.extractedData);
       
-      const excelData = processedDocs.map(doc => ({
-        'ID': doc.id,
-        'Nombre Archivo': doc.originalFilename,
-        'Fecha Subida': doc.uploadedAt?.toLocaleDateString('es-ES'),
-        'Fecha Procesado': doc.processedAt?.toLocaleDateString('es-ES'),
-        'CIF': doc.extractedData?.cif || '',
-        'Nro. Préstamo': doc.extractedData?.loanNumber || '',
-        'Cuenta': doc.extractedData?.account || '',
-        'Nombre Apellido': doc.extractedData?.fullName || '',
-        'Nro. DPI': doc.extractedData?.dpi || '',
-        'Monto del Préstamo': doc.extractedData?.loanAmount || '',
-        'Confianza (%)': doc.confidence || 0,
-        'Tiempo Procesamiento (ms)': doc.processingTime || 0,
-      }));
+      const excelData = processedDocs.map(doc => {
+        const extractedData = doc.extractedData as any;
+        return {
+          'ID': doc.id,
+          'Nombre Archivo': doc.originalFilename,
+          'Fecha Subida': doc.uploadedAt?.toLocaleDateString('es-ES'),
+          'Fecha Procesado': doc.processedAt?.toLocaleDateString('es-ES'),
+          'CIF': extractedData?.cif || '',
+          'Nro. Préstamo': extractedData?.loanNumber || '',
+          'Cuenta': extractedData?.account || '',
+          'Nombre Apellido': extractedData?.fullName || '',
+          'Nro. DPI': extractedData?.dpi || '',
+          'Monto del Préstamo': extractedData?.loanAmount || '',
+          'Confianza (%)': doc.confidence || 0,
+          'Tiempo Procesamiento (ms)': doc.processingTime || 0,
+        };
+      });
       
       const worksheet = XLSX.utils.json_to_sheet(excelData);
       const workbook = XLSX.utils.book_new();

@@ -54,6 +54,11 @@ export class MemStorage implements IStorage {
       id,
       uploadedAt: new Date(),
       processedAt: null,
+      status: insertDocument.status || 'queued',
+      extractedData: insertDocument.extractedData || null,
+      errorMessage: insertDocument.errorMessage || null,
+      processingTime: insertDocument.processingTime || null,
+      confidence: insertDocument.confidence || null,
     };
     this.documents.set(id, document);
     return document;
